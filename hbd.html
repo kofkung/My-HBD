@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎉 อวยพรวันเกิด</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 500px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .form-container {
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .input-group {
+            margin: 20px 0;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-size: 0.9em;
+            display: none;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+
+        button {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .wishes-container {
+            display: none;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .wishes-text {
+            font-size: 1.5em;
+            line-height: 1.6;
+            margin: 20px 0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .balloons {
+            font-size: 3em;
+            margin: 20px 0;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .reset-btn {
+            background: rgba(255, 255, 255, 0.2);
+            margin-top: 20px;
+            padding: 10px 30px;
+            font-size: 1em;
+        }
+
+        .loading {
+            display: none;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-message {
+            color: #2ecc71;
+            background: rgba(46, 204, 113, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px 0;
+            display: none;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container" id="formContainer">
+            <h1>🎂 อวยพรวันเกิด</h1>
+            <p style="margin-bottom: 30px; font-size: 1.1em;">กรอกชื่อของคุณเพื่อรับคำอวยพรวันเกิดพิเศษ!</p>
+            
+            <div class="input-group">
+                <input type="text" id="nameInput" placeholder="กรอกชื่อของคุณที่นี่..." maxlength="50">
+                <div class="error-message" id="errorMessage"></div>
+                <div class="success-message" id="successMessage">ชื่อถูกต้องแล้ว! 👍</div>
+            </div>
+            
+            <button onclick="generateWishes()" id="generateBtn">
+                🎉 สร้างคำอวยพร
+            </button>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>กำลังสร้างคำอวยพรพิเศษ...</p>
+            </div>
+        </div>
+
+        <div class="wishes-container" id="wishesContainer">
+            <div class="balloons">🎈🎈🎈</div>
+            <div class="wishes-text" id="wishesText"></div>
+            <div class="balloons">🎊🎁🎊</div>
+            <button class="reset-btn" onclick="resetForm()">
+                สร้างคำอวยพรใหม่
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Error handling และ validation functions
+        function validateName(name) {
+            const errors = [];
+            
+            // ตรวจสอบว่าไม่เป็นค่าว่าง
+            if (!name || name.trim() === '') {
+                errors.push('กรุณากรอกชื่อของคุณ');
+                return errors;
+            }
+            
+            // ตรวจสอบความยาว
+            if (name.trim().length < 2) {
+                errors.push('ชื่อต้องมีอย่างน้อย 2 ตัวอักษร');
+            }
+            
+            if (name.trim().length > 50) {
+                errors.push('ชื่อต้องไม่เกิน 50 ตัวอักษร');
+            }
+            
+            // ตรวจสอบตัวอักษรพิเศษที่ไม่ต้องการ
+            const invalidChars = /[<>\/\\&"'`]/;
+            if (invalidChars.test(name)) {
+                errors.push('ชื่อไม่ควรมีตัวอักษรพิเศษ < > / \\ & " \' `');
+            }
+            
+            // ตรวจสอบการใส่ตัวเลขเยอะเกินไป
+            const numberCount = (name.match(/\d/g) || []).length;
+            if (numberCount > name.length / 2) {
+                errors.push('ชื่อไม่ควรมีตัวเลขเยอะเกินไป');
+            }
+            
+            return errors;
+        }
+
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            const successElement = document.getElementById('successMessage');
+            
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            successElement.style.display = 'none';
+            
+            // ซ่อน error หลังจาก 5 วินาที
+            setTimeout(() => {
+                errorElement.style.display = 'none';
+            }, 5000);
+        }
+
+        function showSuccess() {
+            const errorElement = document.getElementById('errorMessage');
+            const successElement = document.getElementById('successMessage');
+            
+            errorElement.style.display = 'none';
+            successElement.style.display = 'block';
+            
+            setTimeout(() => {
+                successElement.style.display = 'none';
+            }, 2000);
+        }
+
+        function clearMessages() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        // Real-time validation
+        document.getElementById('nameInput').addEventListener('input', function() {
+            const name = this.value;
+            if (name.length > 0) {
+                const errors = validateName(name);
+                if (errors.length === 0) {
+                    showSuccess();
+                } else {
+                    clearMessages();
+                }
+            } else {
+                clearMessages();
+            }
+        });
+
+        function generateWishes() {
+            try {
+                const nameInput = document.getElementById('nameInput');
+                const name = nameInput.value;
+                
+                // Validate input
+                const errors = validateName(name);
+                if (errors.length > 0) {
+                    showError(errors[0]);
+                    nameInput.focus();
+                    return;
+                }
+                
+                // Show loading
+                showLoading(true);
+                
+                // Simulate processing time
+                setTimeout(() => {
+                    try {
+                        const cleanName = sanitizeName(name.trim());
+                        const wishes = createBirthdayWishes(cleanName);
+                        displayWishes(wishes);
+                        showLoading(false);
+                    } catch (error) {
+                        console.error('Error generating wishes:', error);
+                        showError('เกิดข้อผิดพลาดในการสร้างคำอวยพร กรุณาลองใหม่อีกครั้ง');
+                        showLoading(false);
+                    }
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Unexpected error:', error);
+                showError('เกิดข้อผิดพลาดที่ไม่คาดคิด กรุณาลองใหม่อีกครั้ง');
+                showLoading(false);
+            }
+        }
+
+        function sanitizeName(name) {
+            // ลบตัวอักษรพิเศษที่อันตราย
+            return name.replace(/[<>\/\\&"'`]/g, '').trim();
+        }
+
+        function createBirthdayWishes(name) {
+            const wishes = [
+                `🎉 สุขสันต์วันเกิด ${name}! 🎉\nขอให้มีความสุขมากๆ สุขภาพแข็งแรง และประสบความสำเร็จในทุกสิ่งที่ตั้งใจไว้น้ะ`,
+                
+                `🎂 วันนี้เป็นวันพิเศษของ ${name} 🎂\nขอให้ปีใหม่ของชีวิตเต็มไปด้วยรอยยิ้ม เสียงหัวเราะ และความทรงจำดีๆ`,
+                
+                `🌟 Happy Birthday ${name}! 🌟\nขอให้ทุกความฝันเป็นจริง ทุกความหวังสมประสงค์ และมีคนรักล้อมรอบตลอดไป`,
+                
+                `🎈 ${name} ขอให้มีวันเกิดที่แสนพิเศษ! 🎈\nขอให้แต่ละวันของเธอเต็มไปด้วยความสุข ความรัก และสิ่งดีๆ ทั้งหลาย`
+            ];
+            
+            const randomWish = wishes[Math.floor(Math.random() * wishes.length)];
+            return randomWish;
+        }
+
+        function showLoading(show) {
+            const loading = document.getElementById('loading');
+            const button = document.getElementById('generateBtn');
+            
+            if (show) {
+                loading.style.display = 'block';
+                button.disabled = true;
+                button.textContent = 'กำลังสร้าง...';
+            } else {
+                loading.style.display = 'none';
+                button.disabled = false;
+                button.textContent = '🎉 สร้างคำอวยพร';
+            }
+        }
+
+        function displayWishes(wishes) {
+            try {
+                document.getElementById('wishesText').textContent = wishes;
+                document.getElementById('formContainer').style.display = 'none';
+                document.getElementById('wishesContainer').style.display = 'block';
+            } catch (error) {
+                console.error('Error displaying wishes:', error);
+                showError('ไม่สามารถแสดงคำอวยพรได้ กรุณาลองใหม่อีกครั้ง');
+            }
+        }
+
+        function resetForm() {
+            try {
+                document.getElementById('formContainer').style.display = 'block';
+                document.getElementById('wishesContainer').style.display = 'none';
+                document.getElementById('nameInput').value = '';
+                clearMessages();
+                document.getElementById('nameInput').focus();
+            } catch (error) {
+                console.error('Error resetting form:', error);
+                // Force page reload as fallback
+                window.location.reload();
+            }
+        }
+
+        // Enter key support
+        document.getElementById('nameInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateWishes();
+            }
+        });
+
+        // Focus on input when page loads
+        window.addEventListener('load', function() {
+            document.getElementById('nameInput').focus();
+        });
+
+        // Error handling for unexpected errors
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+            showError('เกิดข้อผิดพลาดในระบบ กรุณาลองใหม่อีกครั้ง');
+        });
+    </script>
+</body>
+</html>
